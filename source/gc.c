@@ -23,7 +23,6 @@ GC* gc_init()
 
 	gc->object_max = STACKSIZE / 8;
 	gc->stack_pos = 0;
-	gc->object_count = 0;
 
 	object* root = gc_push(gc, NULL);
 	if (!root) return NULL;
@@ -44,13 +43,13 @@ object* gc_root(GC* gc)
 	return gc->stack[0];
 }
 
-object* gc_push(GC* gc, int* parent)
+object* gc_push(GC* gc, object* parent)
 {
 	object* obj = (object*)malloc(sizeof(object));
 	if (!obj) return obj;
 
 	obj->marked = false;
-	obj->parent = parent;
+	obj->parent = (void*)parent;
 	obj->data = NULL;
 
 	gc->stack[gc->stack_pos++] = obj;
@@ -81,7 +80,7 @@ void gc_mark_objects(GC* gc)
 	//TODO
 }
 
-void gc_realloc(GC* gc)
+void gc_realloc(GC* gc) //use #define REALLOCATION 1 / 0
 {
 	//TODO
 }
