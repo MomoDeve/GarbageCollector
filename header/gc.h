@@ -8,7 +8,7 @@ typedef unsigned int bool;
 
 typedef struct
 {
-	int* parent;
+	void* parent;
 	bool marked;
 	void* data;
 } object;
@@ -26,7 +26,7 @@ void gc_free(GC*);
 
 object* gc_root(GC*);
 
-object* gc_push(GC*, int*);
+object* gc_push(GC*, object*);
 
 void gc_mark_objects(GC*);
 
