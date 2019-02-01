@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEBUG_MODE 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "gc.h"
@@ -29,7 +31,6 @@ GC* gc_init()
 	object* root = gc_push(gc, NULL);
 	if (!root) return NULL;
 	root->marked = true;
-
 	return gc;
 
 }
@@ -50,7 +51,7 @@ object* gc_root(GC* gc)
 object* gc_push(GC* gc, object* parent)
 {
 	object* obj = (object*)malloc(sizeof(object));
-	if (!obj) return obj;
+	if (obj == NULL) return obj;
 
 	obj->marked = false;
 	obj->parent = (void*)parent;
@@ -64,10 +65,14 @@ object* gc_push(GC* gc, object* parent)
 		gc_collect_garbage(gc);
 		gc->object_max *= 2;
 	}
+	return obj;
 }
 
 void gc_collect_garbage(GC* gc)
 {
+	#if DEBUG_MODE == 1
+	int counter = 0;
+	#endif
 	for (int i = gc->stack_pos - 1; i > 0; i--)
 	{
 		if (!gc->stack[i]->marked)
@@ -75,12 +80,18 @@ void gc_collect_garbage(GC* gc)
 			void* data = gc->stack[i]->data;
 			if (data != NULL) free(data);
 			free(gc->stack[i]);
+			#if DEBUG_MODE == 1
+			counter++;
+			#endif
 		}
 		else
 		{
 			gc->stack[i]->marked = false;
 		}
 	}
+	#if DEBUG_MODE == 1
+	printf("cleared %d objects\n", counter);
+	#endif
 	if (gc->stack_pos > 1) gc_realloc(gc);
 }
 
@@ -90,7 +101,9 @@ void gc_mark_objects(GC* gc)
 	{
 		object* parent = (object*)gc->stack[i]->parent;
 		gc->stack[i]->marked = parent->marked;
+		if (DEBUG_MODE && gc->stack[i]->marked) printf("marked object[%d]\n", i);
 	}
+	if (DEBUG_MODE) printf("----------------------------------------marking ended----------------------------------------\n");
 }
 
 void gc_realloc(GC* gc) 
