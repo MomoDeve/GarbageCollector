@@ -16,6 +16,8 @@
 #define NULL (void*)0
 #endif
 
+object* reserved_buffer[STACKSIZE];
+
 GC* gc_init()
 {
 	GC* gc = (GC*)malloc(sizeof(GC));
@@ -29,12 +31,14 @@ GC* gc_init()
 	root->marked = true;
 
 	return gc;
+
 }
 
 void gc_free(GC* gc)
 {
 	gc_root(gc)->marked = false;
 	gc_collect_garbage(gc);
+	free(gc_root(gc));
 	free(gc);
 }
 
@@ -64,23 +68,42 @@ object* gc_push(GC* gc, object* parent)
 
 void gc_collect_garbage(GC* gc)
 {
-	for (int i = gc->stack_pos - 1; i >= 0; i--)
+	for (int i = gc->stack_pos - 1; i > 0; i--)
 	{
 		if (!gc->stack[i]->marked)
 		{
 			void* data = gc->stack[i]->data;
 			if (data != NULL) free(data);
+			free(gc->stack[i]);
+		}
+		else
+		{
+			gc->stack[i]->marked = false;
 		}
 	}
-	if(gc->stack_pos != 0) gc_realloc(gc);
+	if (gc->stack_pos > 1) gc_realloc(gc);
 }
 
 void gc_mark_objects(GC* gc)
 {
-	//TODO
+	for (int i = 1; i < gc->stack_pos; i++)
+	{
+		object* parent = (object*)gc->stack[i]->parent;
+		gc->stack[i]->marked = parent->marked;
+	}
 }
 
-void gc_realloc(GC* gc) //use #define REALLOCATION 1 / 0
+void gc_realloc(GC* gc) 
 {
-	//TODO
+	int j = 0;
+	for (int i = 0; i < gc->stack_pos; i++)
+	{
+		if (gc->stack[i] == NULL) continue;
+		reserved_buffer[j++] = gc->stack[i];
+	}
+	gc->stack_pos = j;
+	for (int i = 0; i < gc->stack_pos; i++)
+	{
+		gc->stack[i] = reserved_buffer[i];
+	}
 }
