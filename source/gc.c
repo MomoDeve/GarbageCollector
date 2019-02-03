@@ -1,6 +1,6 @@
 #pragma once
 
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1
 #define assert(decimal) printf(#decimal": %d\n", decimal);
 
 #include <stdio.h>
@@ -21,6 +21,12 @@
 
 object* reserved_buffer[STACKSIZE];
 
+void gc_mark_objects(GC* gc);
+
+void gc_collect_garbage(GC* gc);
+
+void gc_realloc(GC* gc);
+
 GC* gc_init()
 {
 	GC* gc = (GC*)malloc(sizeof(GC));
@@ -31,9 +37,9 @@ GC* gc_init()
 
 	object* root = gc_push(gc, NULL);
 	if (!root) return NULL;
+
 	root->marked = true;
 	return gc;
-
 }
 
 void gc_free(GC* gc)
@@ -51,19 +57,20 @@ object* gc_root(GC* gc)
 
 object* gc_push(GC* gc, object* parent)
 {
-	object* obj = (object*)malloc(sizeof(object));
-	if (obj == NULL) return obj;
-
-	obj->marked = false;
-	obj->parent = (void*)parent;
-	obj->data = NULL;
-
 	if (gc->stack_pos == gc->object_max)
 	{
 		if (gc->stack_pos < STACKSIZE) gc->object_max *= 2;
 		gc_mark_objects(gc);
 		gc_collect_garbage(gc);
 	}
+	if (gc->stack_pos == STACKSIZE) return NULL;
+
+	object* obj = (object*)malloc(sizeof(object));
+	if (obj == NULL) return obj;
+
+	obj->marked = false;
+	obj->parent = (void*)parent;
+	obj->data = NULL;
 
 	gc->stack[gc->stack_pos++] = obj;
 	return obj;
@@ -100,7 +107,7 @@ void gc_collect_garbage(GC* gc)
 	#if DEBUG_MODE == 1
 	printf("cleared %d objects\n", counter);
 	#endif
-	if (gc->stack_pos > 1) gc_realloc(gc);
+	gc_realloc(gc);
 }
 
 void gc_mark_objects(GC* gc)
