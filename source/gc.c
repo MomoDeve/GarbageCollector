@@ -48,6 +48,7 @@ void gc_free(GC* gc)
 	gc_collect_garbage(gc);
 	free(gc_root(gc));
 	free(gc);
+	if (DEBUG_MODE) printf("cleared 1 object\ncleared gc\n");
 }
 
 object* gc_root(GC* gc)
@@ -73,6 +74,7 @@ object* gc_push(GC* gc, object* parent)
 	obj->data = NULL;
 
 	gc->stack[gc->stack_pos++] = obj;
+	if (DEBUG_MODE) printf("pushed [%d]\n", gc->stack_pos - 1);
 	return obj;
 }
 
@@ -134,5 +136,5 @@ void gc_realloc(GC* gc)
 	{
 		gc->stack[i] = reserved_buffer[i];
 	}
-	if (DEBUG_MODE) printf("reallocated %d elements in stack\n", gc->stack_pos);
+	if (DEBUG_MODE) printf("reallocated %d element in stack\n", gc->stack_pos);
 }
