@@ -1,15 +1,11 @@
 #pragma once
 
-#ifndef bool
-typedef unsigned short int bool;
-#endif
-
 #define STACKSIZE 1024
 
 typedef struct
 {
 	void* parent;
-	bool marked;
+	unsigned short int marked;
 	void* data;
 } object;
 
@@ -33,6 +29,8 @@ object* gc_push(GC* gc, object* parent);
 #define alloc(object_type) (malloc(sizeof(object_type)))
 
 #define new(object_type, parent, gc) ((object_type*)(gc_push(gc, parent)->data = malloc(sizeof(object_type))))
+
+#define new_arr(object_type, size, parent, gc) ((object_type*)(gc_push(gc, parent)->data = malloc((size) * sizeof(object_type))))
 
 #define _push(gc) object* __gc_object = gc_push(gc, gc_root(gc));
 
