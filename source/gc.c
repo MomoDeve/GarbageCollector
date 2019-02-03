@@ -1,6 +1,7 @@
 #pragma once
 
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
+#define assert(decimal) printf(#decimal": %d\n", decimal);
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,14 +58,14 @@ object* gc_push(GC* gc, object* parent)
 	obj->parent = (void*)parent;
 	obj->data = NULL;
 
-	gc->stack[gc->stack_pos++] = obj;
-
 	if (gc->stack_pos == gc->object_max)
 	{
+		if (gc->stack_pos < STACKSIZE) gc->object_max *= 2;
 		gc_mark_objects(gc);
 		gc_collect_garbage(gc);
-		gc->object_max *= 2;
 	}
+
+	gc->stack[gc->stack_pos++] = obj;
 	return obj;
 }
 
@@ -78,8 +79,15 @@ void gc_collect_garbage(GC* gc)
 		if (!gc->stack[i]->marked)
 		{
 			void* data = gc->stack[i]->data;
-			if (data != NULL) free(data);
+			if (data != NULL)
+			{
+				free(data);
+				data = NULL;
+			}
+
 			free(gc->stack[i]);
+			gc->stack[i] = NULL;
+
 			#if DEBUG_MODE == 1
 			counter++;
 			#endif
@@ -119,4 +127,5 @@ void gc_realloc(GC* gc)
 	{
 		gc->stack[i] = reserved_buffer[i];
 	}
+	if (DEBUG_MODE) printf("reallocated %d elements in stack\n", gc->stack_pos);
 }
