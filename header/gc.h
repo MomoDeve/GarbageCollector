@@ -34,7 +34,7 @@ object* gc_push(GC* gc, object* parent);
 
 #define new(object_type, parent, gc) ((object_type*)(gc_push(gc, parent)->data = malloc(sizeof(object_type))))
 
-#define _push(gc) object* __gc_object = gc_push(gc, gc_root(gc)); __gc_object->marked = 1
+#define _push(gc) object* __gc_object = gc_push(gc, gc_root(gc));
 
 #define _cur(gc) (__gc_object) 
 
