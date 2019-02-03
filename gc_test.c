@@ -27,6 +27,9 @@ int main()
 	p2->first = 7, p2->second = -14;
 	int_pair* p3 = pair_sum(_cur(gc), p1, p2);
 	printf("sum of pairs: {%d, %d}\n", p3->first, p3->second);
+	int* A = new_arr(int, 10, _cur(gc), gc);
+	for (int i = 0; i < 10; i++) A[i] = i;
+	for (int i = 0; i < 10; i++) printf("%d ", A[i]);
 	_pop(gc);
 	gc_free(gc);
 	system("pause");
