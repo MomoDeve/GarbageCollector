@@ -9,7 +9,7 @@ typedef struct
 	int first, second;
 } int_pair;
 
-void first_test() // stack changes his size correctly, objects, are created
+void first_test() // stack changes his size correctly, objects are created and preserved
 {
 	_push(gc);
 	for (int i = 0; i < STACKSIZE - 4; i++)
