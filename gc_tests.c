@@ -33,7 +33,7 @@ void second_test() //nested objects are deleted
 	// watch debug log of GC (all objects should be deleted)
 }
 
-void third_test() // custom struct initialisation
+void third_test() // custom struct initialization
 {
 	_push(gc);
 	int_pair* p1 = new(int_pair, _cur(gc), gc);
@@ -57,7 +57,7 @@ void forth_test(int* o)
 		_push(gc);
 		int* var = new(int, _cur(gc), gc);
 		*var = 128;
-		forth_test(var); // check id elements can be translated through functions
+		forth_test(var); // check if elements can be translated through functions
 		_pop(gc);
 	}
 	else
