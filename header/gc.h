@@ -1,6 +1,6 @@
 #pragma once
 
-#define STACKSIZE 1024
+#define STACKSIZE 1024 // do not alloc more than (STACKSIZE - 2 * function recursive calls) elements!
 #define MIN_SIZE 128 //must be STACKSIZE / (2^n)
 
 typedef struct
