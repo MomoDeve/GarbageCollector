@@ -1,6 +1,7 @@
 #pragma once
 
 #define STACKSIZE 1024
+#define MIN_SIZE 128 //must be STACKSIZE / (2^n)
 
 typedef struct
 {
