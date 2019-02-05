@@ -1,7 +1,6 @@
 #pragma once
 
 #define DEBUG_MODE 0
-#define assert(decimal) printf(#decimal": %d\n", decimal);
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,12 +31,16 @@ GC* gc_init()
 	GC* gc = (GC*)malloc(sizeof(GC));
 	if (!gc) return NULL;
 
-	gc->object_max = STACKSIZE / 8;
+	gc->object_max = MIN_SIZE;
 	gc->stack_pos = 0;
 
 	object* root = gc_push(gc, NULL);
 	if (!root) return NULL;
-
+	
+	for (int i = 1; i < STACKSIZE; i++)
+	{
+		gc->stack[i] = NULL;
+	}
 	root->marked = true;
 	return gc;
 }
@@ -101,7 +104,7 @@ void gc_collect_garbage(GC* gc)
 			gc->stack[i]->marked = false;
 		}
 	}
-	if(DEBUG_MODE) printf("cleared [%d] objects\n", counter);
+	if (DEBUG_MODE) printf("cleared [%d] objects\n", counter);
 	gc_realloc(gc);
 }
 
@@ -116,7 +119,7 @@ void gc_mark_objects(GC* gc)
 	if (DEBUG_MODE) printf("----------------------------------------marking ended----------------------------------------\n");
 }
 
-void gc_realloc(GC* gc) 
+void gc_realloc(GC* gc)
 {
 	int j = 0;
 	for (int i = 0; i < gc->stack_pos; i++)
