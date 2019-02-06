@@ -125,12 +125,8 @@ void gc_realloc(GC* gc)
 	for (int i = 0; i < gc->stack_pos; i++)
 	{
 		if (gc->stack[i] == NULL) continue;
-		reserved_buffer[j++] = gc->stack[i];
+		gc->stack[j++] = gc->stack[i];
 	}
 	gc->stack_pos = j;
-	for (int i = 0; i < gc->stack_pos; i++)
-	{
-		gc->stack[i] = reserved_buffer[i];
-	}
 	if (DEBUG_MODE) printf("reallocated [%d] elements in stack\n", gc->stack_pos);
 }
