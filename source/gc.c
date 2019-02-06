@@ -18,8 +18,6 @@
 #define NULL (void*)0
 #endif
 
-object* reserved_buffer[STACKSIZE];
-
 void gc_mark_objects(GC* gc);
 
 void gc_collect_garbage(GC* gc);
